@@ -1,0 +1,44 @@
+{
+  "id": "com.shopify.mcp-server",
+  "title": "Shopify MCP Server",
+  "author": "Shopify",
+  "description": "Model Context Protocol (MCP) server for Shopify development and integration",
+  "tagline": "Connect to Shopify via MCP protocol",
+  "version": "1.0.0",
+  "healthCheckPath": "/",
+  "httpPort": 3000,
+  "manifestVersion": 2,
+  "website": "https://github.com/shopify/dev-mcp",
+  "contactEmail": "support@example.com",
+  "icon": "file://icon.png",
+  "tags": [
+    "developer",
+    "api",
+    "shopify",
+    "integration",
+    "mcp"
+  ],
+  "mediaLinks": [],
+  "changelog": "Initial release",
+  "minBoxVersion": "7.4.0",
+  "documentationUrl": "https://github.com/shopify/dev-mcp",
+  "forumUrl": "https://community.cloudron.io",
+  "addons": {
+    "localstorage": {},
+    "scheduler": {
+      "cleanup": {
+        "schedule": "00 00 2 * * *",
+        "command": "/app/code/cleanup.sh"
+      }
+    }
+  },
+  "memoryLimit": 536870912,
+  "tcpPorts": {
+    "MCP_PORT": {
+      "title": "MCP Server Port",
+      "description": "Port for MCP server communication",
+      "defaultValue": 8080
+    }
+  },
+  "optionalSso": true
+}
