@@ -1,0 +1,20 @@
+{
+  "id": "dev.shopify.mcp",
+  "title": "Shopify MCP Server",
+  "author": "Cloudron",
+  "description": "Shopify Development MCP Server for AI model integration",
+  "tagline": "AI-powered Shopify development assistance",
+  "version": "1.0.0",
+  "httpPort": 8080,
+  "healthCheckPath": "/health",
+  "addons": {},
+  "manifestVersion": 2,
+  "website": "https://shopify.dev/docs/api/mcp",
+  "icon": "logo.png",
+  "tags": [
+    "development",
+    "ai",
+    "shopify",
+    "mcp"
+  ]
+}

@@ -1,52 +1,16 @@
-# Shopify MCP Server - Cloudron Package
+# Shopify MCP Server for Cloudron
 
-This is a Cloudron custom app package for running the Shopify Model Context Protocol (MCP) server.
+A Cloudron package for the Shopify Development MCP Server.
 
-## What is MCP?
+## Features
 
-The Model Context Protocol (MCP) is a protocol that enables AI assistants and development tools to interact with external systems like Shopify stores through a standardized interface.
+- Runs the latest `@shopify/dev-mcp` server
+- Optional authentication (Header or OAuth2Bearer)
+- Cloudron-native configuration management
 
-## Package Structure
+## Installation
 
-```
-shopify-mcp-cloudron/
-├── CloudronManifest.json   # Cloudron app metadata and configuration
-├── Dockerfile              # Container definition for Cloudron
-├── docker-compose.yml      # For local testing
-├── README.md              # This file
-├── icon.png               # App icon (256x256 PNG)
-└── CHANGELOG.md           # Version history
-```
-
-## Prerequisites
-
-- Cloudron instance (v7.4.0 or higher)
-- Cloudron CLI tools installed
-- Docker (for local testing)
-- Shopify store and API credentials
-
-## Building the Package
-
-### 1. Local Testing
-
-First, test the package locally using Docker Compose:
-
-```bash
-# Build and run locally
-docker-compose up --build
-
-# Test the health check
-curl http://localhost:3000/
-
-# Check logs
-docker-compose logs -f
-```
-
-### 2. Create App Icon
-
-Create a 256x256 PNG icon for your app and save it as `icon.png` in the package directory.
-
-### 3. Build Cloudron Package
+Build locally:
 
 ```bash
 # Install Cloudron CLI if not already installed
@@ -61,11 +25,8 @@ cloudron build
 # This creates a package file like: com.shopify.mcp-server@1.0.0.tar.gz
 ```
 
-## Installation on Cloudron
-
-### Method 1: Via Cloudron CLI
-
-```bash
+### Method 1: Cloudron CLI
+```
 # Install the app
 cloudron install --location mcp.yourdomain.com
 
@@ -73,8 +34,7 @@ cloudron install --location mcp.yourdomain.com
 cloudron install --location mcp.yourdomain.com --image com.shopify.mcp-server@1.0.0.tar.gz
 ```
 
-### Method 2: Via Cloudron Web Interface
-
+### Method 2: Cloudron Web Interface
 1. Go to your Cloudron dashboard
 2. Click "App Store" → "Install Custom App"
 3. Upload the package file (com.shopify.mcp-server@1.0.0.tar.gz)
@@ -85,48 +45,67 @@ cloudron install --location mcp.yourdomain.com --image com.shopify.mcp-server@1.
 
 ## Configuration
 
-### Environment Variables
+Configure authentication and server settings through Cloudron's environment variables.
 
-After installation, configure these environment variables in the Cloudron app settings:
+### Setting Environment Variables
 
+1. **Via Cloudron Dashboard:**
+   - Go to your app's settings in the Cloudron dashboard
+   - Navigate to the "Environment" tab
+   - Add or modify environment variables as needed
+   - Click "Save" and restart the app
+
+2. **Via Cloudron CLI:**
+   ```bash
+   # Set authentication type
+   cloudron env set AUTH_TYPE header
+   
+   # Set authentication token
+   cloudron env set AUTH_TOKEN your-secret-token
+   
+   # Set custom header name (optional)
+   cloudron env set AUTH_HEADER_NAME X-API-Key
+   
+   # Restart the app to apply changes
+   cloudron restart
+   ```
+
+### Available Environment Variables
+
+- `AUTH_TYPE`: Authentication method
+  - `header` - Use header-based authentication
+  - `oauth2bearer` - Use OAuth2 Bearer token authentication
+  - Empty/unset - No authentication required
+- `AUTH_TOKEN`: Authentication token (required if AUTH_TYPE is set)
+- `AUTH_HEADER_NAME`: Header name for authentication (default: `Authorization`)
+- `PORT`: Server port (default: `8080`, automatically managed by Cloudron)
+- `OPT_OUT_INSTRUMENTATION`: Disable telemetry (default: `false`)
+- `POLARIS_UNIFIED`: Enable Polaris unified mode (default: `false`)
+- `LIQUID`: Enable Liquid template support (default: `false`)
+- `LIQUID_VALIDATION_MODE`: Liquid validation mode (default: `partial`)
+
+### Authentication Examples
+
+**Header Authentication:**
 ```bash
-# Required for Shopify integration
-SHOPIFY_API_KEY=your_api_key
-SHOPIFY_API_SECRET=your_api_secret
-SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_ACCESS_TOKEN=your_access_token
-
-# Optional
-PORT=3000  # Default port
-NODE_ENV=production
+cloudron env set AUTH_TYPE header
+cloudron env set AUTH_TOKEN your-api-key-here
+cloudron env set AUTH_HEADER_NAME X-API-Key
+cloudron restart
 ```
 
-### Setting Environment Variables in Cloudron
+**OAuth2 Bearer Authentication:**
+```bash
+cloudron env set AUTH_TYPE oauth2bearer
+cloudron env set AUTH_TOKEN your-bearer-token-here
+cloudron restart
+```
 
-1. Go to your Cloudron dashboard
-2. Click on the installed Shopify MCP Server app
-3. Go to "Configuration" → "Environment"
-4. Add your environment variables
-5. Click "Save" and restart the app
-
-## Connecting to the MCP Server
-
-Once installed, the MCP server will be available at:
-
-- **HTTP Endpoint**: `https://mcp.yourdomain.com`
-- **MCP Protocol**: `https://mcp.yourdomain.com:8080`
-
-### Example Connection
-
-```javascript
-// Example Node.js client connection
-const mcpClient = new MCPClient({
-  endpoint: 'https://mcp.yourdomain.com:8080',
-  protocol: 'mcp',
-  auth: {
-    // Your authentication details
-  }
-});
+**No Authentication:**
+```bash
+cloudron env unset AUTH_TYPE
+cloudron env unset AUTH_TOKEN
+cloudron restart
 ```
 
 ## Updating the Package
@@ -142,74 +121,58 @@ cloudron build
 cloudron update --app mcp.yourdomain.com --image com.shopify.mcp-server@1.1.0.tar.gz
 ```
 
-## Monitoring and Logs
 
-### View Logs
+## Usage
 
-```bash
-# Via CLI
-cloudron logs --app mcp.yourdomain.com
+Once installed, the MCP server will be available at your Cloudron app URL with HTTP endpoints for remote access.
 
-# Or in the web interface
-# Go to the app → Logs
+### HTTP Endpoints
+
+- **MCP Endpoint**: `https://your-app-url/mcp` (POST for JSON-RPC requests, GET for server info)
+- **Health Check**: `https://your-app-url/health` (GET for server status)
+
+### Connecting from n8n
+
+In n8n's AI Agent node, configure the endpoint setting:
+
+```
+Endpoint URL: https://your-app-url/mcp
+Method: POST
+Content-Type: application/json
 ```
 
-### Health Checks
+### JSON-RPC Request Format
 
-The app includes automatic health checks. If the service fails, Cloudron will automatically restart it.
+Send POST requests to `/mcp` with JSON-RPC 2.0 format:
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Port conflicts**: Ensure ports 3000 and 8080 are not used by other apps
-2. **Memory issues**: Increase memory limit if the app crashes
-3. **API connection failures**: Verify Shopify API credentials
-4. **Permission errors**: The app runs as non-root user (uid 1000)
-
-### Debug Mode
-
-Enable debug logging by setting:
-
-```bash
-DEBUG=* 
-NODE_ENV=development
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2024-11-05",
+    "capabilities": {},
+    "clientInfo": {
+      "name": "n8n",
+      "version": "1.0.0"
+    }
+  }
+}
 ```
 
-## Security Considerations
+### Authentication
 
-1. **API Credentials**: Store sensitive credentials as environment variables
-2. **Network Access**: Configure firewall rules if needed
-3. **SSL/TLS**: Cloudron automatically provides SSL certificates
-4. **Updates**: Keep the package updated with latest security patches
+If authentication is configured, include the appropriate header:
 
-## Development
+```bash
+# Header authentication
+Authorization: your-api-key
 
-### Making Changes
+# OAuth2 Bearer authentication  
+Authorization: Bearer your-token
+```
 
-1. Modify the Dockerfile or CloudronManifest.json
-2. Test locally with docker-compose
-3. Rebuild the package
-4. Test on a staging Cloudron instance
-5. Deploy to production
+## Health Check
 
-### Contributing
-
-Feel free to submit issues or pull requests to improve this package.
-
-## Resources
-
-- [Cloudron Documentation](https://docs.cloudron.io)
-- [Cloudron Custom Apps Guide](https://docs.cloudron.io/custom-apps/)
-- [Shopify MCP Documentation](https://github.com/shopify/dev-mcp)
-- [MCP Protocol Specification](https://modelcontextprotocol.io)
-
-## License
-
-This Cloudron package is provided as-is for use with the Shopify MCP server.
-
-## Support
-
-- Cloudron Forums: https://forum.cloudron.io
-- GitHub Issues: [Your repository URL]
-- Email: support@example.com
+The server provides a health check endpoint at `/health` for monitoring.
