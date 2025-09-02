@@ -5,43 +5,44 @@ A Cloudron package for the Shopify Development MCP Server.
 ## Features
 
 - Runs the latest `@shopify/dev-mcp` server
+- HTTP/JSON-RPC endpoint for remote access (compatible with n8n, API clients)
 - Optional authentication (Header or OAuth2Bearer)
 - Cloudron-native configuration management
+- Health monitoring and automatic restart capabilities
 
 ## Installation
 
-Build locally:
+### Prerequisites
+
+- Cloudron instance running
+- Cloudron CLI installed: `npm install -g cloudron`
+
+### Build and Install
 
 ```bash
-# Install Cloudron CLI if not already installed
-npm install -g cloudron
+# Clone this repository
+git clone https://github.com/your-repo/shopify-mcp-cloudron
+cd shopify-mcp-cloudron
 
 # Login to your Cloudron instance
 cloudron login my.cloudron.domain
 
-# Build the package
+# Build the app (no registry push needed for local deployment)
+cloudron build --no-push
+
+# Install directly to your Cloudron
+cloudron install --location mcp.yourdomain.com
+```
+
+### Alternative: Manual Package Installation
+
+```bash
+# Build and package
 cloudron build
 
-# This creates a package file like: com.shopify.mcp-server@1.0.0.tar.gz
-```
-
-### Method 1: Cloudron CLI
-```
-# Install the app
-cloudron install --location mcp.yourdomain.com
-
-# Or specify the package file
+# Install from package file
 cloudron install --location mcp.yourdomain.com --image com.shopify.mcp-server@1.0.0.tar.gz
 ```
-
-### Method 2: Cloudron Web Interface
-1. Go to your Cloudron dashboard
-2. Click "App Store" → "Install Custom App"
-3. Upload the package file (com.shopify.mcp-server@1.0.0.tar.gz)
-4. Configure the installation:
-   - Choose a subdomain (e.g., mcp.yourdomain.com)
-   - Set memory limit (recommended: 512MB minimum)
-   - Configure environment variables if needed
 
 ## Configuration
 
@@ -108,17 +109,17 @@ cloudron env unset AUTH_TOKEN
 cloudron restart
 ```
 
-## Updating the Package
+## Updating the App
 
-To update the app:
+To update an existing installation:
 
 ```bash
-# Increment version in CloudronManifest.json
-# Rebuild the package
-cloudron build
+# Make your changes to the code
+# Rebuild the app
+cloudron build --no-push
 
-# Update the installed app
-cloudron update --app mcp.yourdomain.com --image com.shopify.mcp-server@1.1.0.tar.gz
+# Update the running app
+cloudron update --app mcp.yourdomain.com
 ```
 
 
