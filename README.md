@@ -46,30 +46,37 @@ cloudron install --location mcp.yourdomain.com --image com.shopify.mcp-server@1.
 
 ## Configuration
 
-Configure authentication and server settings through Cloudron's environment variables.
+Configure authentication and server settings through Cloudron's environment variables using the CLI.
 
 ### Setting Environment Variables
 
-1. **Via Cloudron Dashboard:**
-   - Go to your app's settings in the Cloudron dashboard
-   - Navigate to the "Environment" tab
-   - Add or modify environment variables as needed
-   - Click "Save" and restart the app
+**Via Cloudron CLI** (only method available):
 
-2. **Via Cloudron CLI:**
-   ```bash
-   # Set authentication type
-   cloudron env set AUTH_TYPE header
-   
-   # Set authentication token
-   cloudron env set AUTH_TOKEN your-secret-token
-   
-   # Set custom header name (optional)
-   cloudron env set AUTH_HEADER_NAME X-API-Key
-   
-   # Restart the app to apply changes
-   cloudron restart
-   ```
+```bash
+# Set authentication type and token
+cloudron env set --app mcp.yourdomain.com AUTH_TYPE=header AUTH_TOKEN=your-secret-token
+
+# Set custom header name (optional)  
+cloudron env set --app mcp.yourdomain.com AUTH_HEADER_NAME=X-API-Key
+
+# Restart the app to apply changes
+cloudron restart --app mcp.yourdomain.com
+```
+
+**Managing Environment Variables:**
+```bash
+# List all environment variables
+cloudron env list --app mcp.yourdomain.com
+
+# Get a specific environment variable
+cloudron env get --app mcp.yourdomain.com AUTH_TYPE
+
+# Remove environment variables
+cloudron env unset --app mcp.yourdomain.com AUTH_TYPE AUTH_TOKEN
+
+# Restart after changes
+cloudron restart --app mcp.yourdomain.com
+```
 
 ### Available Environment Variables
 
@@ -89,24 +96,20 @@ Configure authentication and server settings through Cloudron's environment vari
 
 **Header Authentication:**
 ```bash
-cloudron env set AUTH_TYPE header
-cloudron env set AUTH_TOKEN your-api-key-here
-cloudron env set AUTH_HEADER_NAME X-API-Key
-cloudron restart
+cloudron env set --app mcp.yourdomain.com AUTH_TYPE=header AUTH_TOKEN=your-api-key-here AUTH_HEADER_NAME=X-API-Key
+cloudron restart --app mcp.yourdomain.com
 ```
 
 **OAuth2 Bearer Authentication:**
 ```bash
-cloudron env set AUTH_TYPE oauth2bearer
-cloudron env set AUTH_TOKEN your-bearer-token-here
-cloudron restart
+cloudron env set --app mcp.yourdomain.com AUTH_TYPE=oauth2bearer AUTH_TOKEN=your-bearer-token-here
+cloudron restart --app mcp.yourdomain.com
 ```
 
 **No Authentication:**
 ```bash
-cloudron env unset AUTH_TYPE
-cloudron env unset AUTH_TOKEN
-cloudron restart
+cloudron env unset --app mcp.yourdomain.com AUTH_TYPE AUTH_TOKEN
+cloudron restart --app mcp.yourdomain.com
 ```
 
 ## Updating the App
